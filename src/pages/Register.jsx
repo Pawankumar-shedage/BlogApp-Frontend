@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Base } from "../Components/Base";
+import { ErrorToast } from "../Components/Errors/ErrorToast";
+import { CreatePost } from "../Components/CreatePost";
 
 export const Register = () => {
+  //
   const centerDiv = {
     display: "flex",
     justifyContent: "center",
@@ -13,41 +17,75 @@ export const Register = () => {
   const navigate = useNavigate(); // Initialize the navigate function
 
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [showError, setShowError] = useState(false);
+  const [user, setUser] = useState({});
+  const [token, setToken] = useState("");
+
+  const getUser = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    }
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/users/${username}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      } else {
+        // Handle error
+        const errorMessage = await response.text();
+        setError(errorMessage);
+        setShowError(true);
+      }
+    } catch (error) {
+      // Handle network or other errors
+      console.error("User data retrieval error:", error);
+    }
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // Create a user object with username, email, and password
-    const user = {
-      username,
-      email,
-      password,
-    };
-
-    try {
-      // Send a POST request to your register endpoint
-      const response = await fetch("/api/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
-
-      if (response.ok) {
-        // Registration successful, navigate to the login page
-        navigate("/login");
-      } else {
-        // Handle registration error
-        setError("Registration failed. Please check your input.");
-      }
-    } catch (error) {
-      // Handle network or other errors
-      console.error("Registration error:", error);
+    const response = await fetch("http://localhost:8080/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userName: username,
+        email: email,
+        userPassword: password,
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const token = data.token; // Extract the token from the response
+      setToken(token);
+      localStorage.setItem("token", token);
+      getUser();
+    } else {
+      // Handle error
+      const errorMessage = await response.text();
+      setError(errorMessage);
+      setShowError(true);
     }
+  };
+
+  const handleCloseError = () => {
+    setShowError(false);
   };
 
   return (
@@ -111,6 +149,11 @@ export const Register = () => {
                 Already have an account? <Link to="/login">Login</Link>
               </p>
               {error && <p style={{ color: "red" }}>{error}</p>}
+              <ErrorToast
+                show={showError}
+                onClose={handleCloseError}
+                message={error}
+              ></ErrorToast>
             </div>
           </form>
         </div>

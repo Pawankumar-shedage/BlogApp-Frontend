@@ -5,8 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 export const MyNavbar = () => {
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate("/login");
+  const handleUserProfile = () => {
+    navigate("/dashboard/userProfile");
   };
 
   return (
@@ -34,10 +34,10 @@ export const MyNavbar = () => {
           </button>
 
           <div
-            className="collapse navbar-collapse "
+            className="collapse navbar-collapse ms-5"
             id="navbarSupportedContent"
           >
-            <ul className="navbar-nav ms-5 mb-2 mb-lg-0">
+            <ul className="navbar-nav mb-2 mb-lg-0">
               <li className="nav-item">
                 <Link
                   className="nav-link  fw-semibold"
@@ -48,7 +48,7 @@ export const MyNavbar = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link fw-semibold" to="/">
+                <Link className="nav-link fw-semibold" to="/about">
                   About
                 </Link>
               </li>
@@ -57,14 +57,7 @@ export const MyNavbar = () => {
                   Login
                 </Link>
               </li>
-              <button
-                className="btn  fw-regular"
-                onClick={handleClick}
-                id="myButton"
-              >
-                Get Started
-              </button>
-              &nbsp; &nbsp;
+
               <form className="d-flex" role="search">
                 <input
                   className="form-control  fw-light "
@@ -73,15 +66,23 @@ export const MyNavbar = () => {
                   placeholder="Search"
                   aria-label="Search"
                 />
-
                 <button className="btn" type="submit">
                   <FontAwesomeIcon icon={faSearch} />
                 </button>
+                &nbsp;&nbsp;
               </form>
               <br />
-              <button className="btn userProfileButton">
-                <FontAwesomeIcon icon={faUser} />
+              <button
+                className="btn  fw-regular"
+                onClick={handleUserProfile}
+                id="myButton"
+              >
+                <FontAwesomeIcon icon={faUser} className="text-start" />
               </button>
+              {/* <button
+                className=" handleUserProfileButton"
+                onClick={handleUserProfile}
+              ></button> */}
             </ul>
           </div>
         </div>

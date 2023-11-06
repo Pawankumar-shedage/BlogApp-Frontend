@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Base } from "../Components/Base";
+import { ErrorToast } from "../Components/Errors/ErrorToast";
+import { doLogin } from "../Auth";
 
-export const Login = () => {
+const Login = () => {
+  // Styles
   const centerDiv = {
     display: "flex",
     justifyContent: "center",
@@ -12,41 +16,86 @@ export const Login = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [token, setToken] = useState("");
   const navigate = useNavigate(); // Use useNavigate to handle navigation
+  // ERRORS
+  const [error, setError] = useState("");
+  const [showError, setShowError] = useState(false);
+  const [user, setUser] = useState({});
+
+  const getUser = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    }
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/users/${username}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData); // Save the user data to the state
+      } else {
+        // Handle error
+        const errorMessage = await response.text();
+        setError(errorMessage);
+        setShowError(true);
+      }
+    } catch (error) {
+      // Handle network or other errors
+      console.error("User data retrieval error:", error);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Create a user object with username and password
-    const user = {
-      username,
-      password,
-    };
-
-    try {
-      // Send a POST request to your login endpoint
-      const response = await fetch("/api/users/login", {
+    const response = await fetch(
+      `http://localhost:8080/api/auth/authenticate`,
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(user),
-      });
-
-      if (response.ok) {
-        // Login successful, navigate to a protected route
-        navigate("/");
-      } else {
-        // Handle login error
-        setError("Invalid username or password");
+        body: JSON.stringify({
+          userName: username,
+          userPassword: password,
+        }),
       }
-    } catch (error) {
-      // Handle network or other errors
-      console.error("Login error:", error);
+    );
+    if (response.ok) {
+      const data = await response.json();
+      const token = data.token; // Extract the token from the response
+      setToken(token);
+      localStorage.setItem("token", token);
+      getUser();
+    } else {
+      // Handle error
+      const errorMessage = await response.text();
+      setError(errorMessage);
+      setShowError(true);
     }
   };
 
+  const handleCloseError = () => {
+    setShowError(false);
+  };
+
+  //RESET Fields
+  const resetFields = () => {
+    setUsername("");
+    setPassword("");
+  };
+
+  // --------------------------------RETURN STATEMENT------------------------------------------
   return (
     <>
       <Base>
@@ -58,44 +107,59 @@ export const Login = () => {
             style={{ width: "50vw" }}
             onSubmit={handleLogin}
           >
-            <div className="col-sm-6 offset-3">
-              <div className="mb-3">
-                <label className="form-label">Username</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="exampleInputEmail1"
-                  aria-describedby="emailHelp"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="exampleInputPassword1"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
+            <div className="mb-3">
+              <label className="form-label">Username</label>
+              <input
+                type="text"
+                className="form-control"
+                required
+                id="exampleInputEmail1"
+                aria-describedby="emailHelp"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                required
+                id="exampleInputPassword1"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-              <div style={centerDiv}>
+            <div style={centerDiv}>
+              <div>
                 <button type="submit" className="btn text-center" id="myButton">
                   Submit
                 </button>
-                <br />
-                <p>OR</p>
-                <p>
-                  Create an account? <Link to="/register">Register</Link>
-                </p>
+                &nbsp;
+                <button
+                  onClick={resetFields}
+                  className="btn text-center myButton"
+                >
+                  Reset
+                </button>
               </div>
-              {error && <p style={{ color: "red" }}>{error}</p>}
+              <br />
+              <p>OR</p>
+              <p>
+                Create an account? <Link to="/register">Register</Link>
+              </p>
             </div>
+            <ErrorToast
+              show={showError}
+              onClose={handleCloseError}
+              message={error}
+            ></ErrorToast>
           </form>
         </div>
       </Base>
     </>
   );
 };
+
+export default Login;
