@@ -5,10 +5,19 @@ import { Base } from "./Base";
 import { loadCategories } from "../Services/Category_service";
 import { getCurrentUserData } from "../Auth";
 
-export const CreatePost = ({ user_ID }) => {
+export const CreatePost = () => {
   // Posting blog-post
 
-  const user_IDD = user_ID;
+  const user_id = localStorage.getItem("user_id");
+  const currentDate = new Date();
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  const createdAt = currentDate.toLocaleDateString("en-US", options);
+
+  console.log(user_id, createdAt);
 
   const [postData, setPostData] = useState({
     title: "",
@@ -21,13 +30,19 @@ export const CreatePost = ({ user_ID }) => {
     user: {
       id: "",
     },
+    createdAt: createdAt,
   });
+
+  console.log(postData);
 
   const [selectedItem, setSelectedItem] = useState("");
 
+  // ---------------CATEGORIES---------------
+
   const updateCategoryID = (e) => {
     setSelectedItem(e.target.value);
-    console.log(e);
+    console.log(e.target.value);
+
     setPostData((prevData) => ({
       ...prevData,
       category: {
@@ -35,32 +50,13 @@ export const CreatePost = ({ user_ID }) => {
         id: e.target.value,
       },
       user: {
-        ...prevData,
-        id: user_IDD,
+        ...prevData.user,
+        id: user_id,
       },
     }));
 
-    console.log(postData);
+    console.log("POST DATA: ", postData);
   };
-
-  //------------------ USER  userID
-
-  //user {object}
-
-  // const updateUserID = (e) => {
-  //   // console.log(e);
-  //   setPostData((prevData) => ({
-  //     ...prevData,
-  //     user: {
-  //       ...prevData.category,
-  //       id: userId,
-  //     },
-  //   }));
-
-  //   console.log(postData);
-  // };
-
-  // ---------------CATEGORIES---------------
 
   const [categories, setCategory] = useState([]);
   useEffect(() => {
@@ -82,7 +78,7 @@ export const CreatePost = ({ user_ID }) => {
       [name]: value,
     });
 
-    console.log(postData.category.id);
+    // console.log(postData.category.id);
   };
 
   // -----------------------------PUBLISH POST---------------

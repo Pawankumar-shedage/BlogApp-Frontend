@@ -21,40 +21,7 @@ export const Register = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [showError, setShowError] = useState(false);
-  const [user, setUser] = useState({});
   const [token, setToken] = useState("");
-
-  const getUser = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      return;
-    }
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/users/${username}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        // Handle error
-        const errorMessage = await response.text();
-        setError(errorMessage);
-        setShowError(true);
-      }
-    } catch (error) {
-      // Handle network or other errors
-      console.error("User data retrieval error:", error);
-    }
-  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -74,8 +41,8 @@ export const Register = () => {
       const data = await response.json();
       const token = data.token; // Extract the token from the response
       setToken(token);
-      localStorage.setItem("token", token);
-      getUser();
+      sessionStorage.setItem("token", token);
+      navigate("/");
     } else {
       // Handle error
       const errorMessage = await response.text();
