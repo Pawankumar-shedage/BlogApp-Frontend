@@ -13,6 +13,7 @@ import { ShowBlogs } from "./Components/ShowBlogs";
 import { About } from "./pages/About";
 import { useState } from "react";
 import { CreateBlogPostT } from "./Components/TEST/CreateBlogPostT";
+import CategorizedPosts from "./Components/categrized_posts/CategorizedPosts";
 
 function App() {
   return (
@@ -23,6 +24,10 @@ function App() {
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<Register />}></Route>
           <Route path="/about" element={<About />}></Route>
+          <Route
+            path="/categories/:categoryId"
+            element={<CategorizedPosts />}
+          ></Route>
 
           {/* Private Routes-- needs log in */}
           <Route path="/dashboard" element={<PrivateRoute />}>

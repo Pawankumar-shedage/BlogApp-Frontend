@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../Components/UserProfile.css";
 import { Base } from "./Base";
+import { Blogs } from "./Blogs";
 
 export const UserProfile = () => {
+  const [userDetails, setUserDetails] = useState({});
   // -------------------USER DETAILS
   const [user, setUser] = useState({
     username: "Binayak Purohit",
@@ -18,132 +20,24 @@ export const UserProfile = () => {
     role: "ADMIN",
   });
 
-  // users list for test.
-  // {
-  //   username: "Binayak Purohit",
-  //   profile_picture: "",
-  //   userid: "2",
-  //   email: "binayaktech@gmail.com",
-  //   bio: "Tech enthusiast and code ninja.",
-  //   about: "",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-  // {
-  //   username: "Rachana G Raikar",
-  //   profile_picture: "",
-  //   userid: "1",
-  //   email: "rachanagraikar@gmail.com",
-  //   bio: "Blogger",
-  //   about:
-  //     "Passionate blogger. I love sharing my thoughts on various topics, including technology, lifestyle, and more.",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-  // {
-  //   username: "Vismaya",
-  //   profile_picture: "",
-  //   userid: "1",
-  //   email: "rachanagraikar@gmail.com",
-  //   bio: "Blogger",
-  //   about:
-  //     "Passionate blogger. I love sharing my thoughts on various topics, including technology, lifestyle, and more.",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-  // {
-  //   username: "Rakshita",
-  //   profile_picture: "",
-  //   userid: "1",
-  //   email: "rachanagraikar@gmail.com",
-  //   bio: "Blogger",
-  //   about:
-  //     "Passionate blogger. I love sharing my thoughts on various topics, including technology, lifestyle, and more.",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-  // {
-  //   username: "Rachana G Raikar",
-  //   profile_picture: "",
-  //   userid: "1",
-  //   email: "rachanagraikar@gmail.com",
-  //   bio: "Blogger",
-  //   about:
-  //     "Passionate blogger. I love sharing my thoughts on various topics, including technology, lifestyle, and more.",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-  // {
-  //   username: "Rachana G Raikar",
-  //   profile_picture: "",
-  //   userid: "1",
-  //   email: "rachanagraikar@gmail.com",
-  //   bio: "Blogger",
-  //   about:
-  //     "Passionate blogger. I love sharing my thoughts on various topics, including technology, lifestyle, and more.",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-  // {
-  //   username: "Rachana G Raikar",
-  //   profile_picture: "",
-  //   userid: "1",
-  //   email: "rachanagraikar@gmail.com",
-  //   bio: "Blogger",
-  //   about:
-  //     "Passionate blogger. I love sharing my thoughts on various topics, including technology, lifestyle, and more.",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-  // {
-  //   username: "Rachana G Raikar",
-  //   profile_picture: "",
-  //   userid: "1",
-  //   email: "rachanagraikar@gmail.com",
-  //   bio: "Blogger",
-  //   about:
-  //     "Passionate blogger. I love sharing my thoughts on various topics, including technology, lifestyle, and more.",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-  // {
-  //   username: "Rachana G Raikar",
-  //   profile_picture: "",
-  //   userid: "1",
-  //   email: "rachanagraikar@gmail.com",
-  //   bio: "Blogger",
-  //   about:
-  //     "Passionate blogger. I love sharing my thoughts on various topics, including technology, lifestyle, and more.",
-  //   followers: 0,
-  //   following: 0,
-  //   role: "ADMIN",
-  // },
-
-  // fetching data from server.
-  const fetchUserDetails = async (userId) => {
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:8080/api/users/${userId}`);
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} - ${response.statusText}`);
-      }
-
-      const user = await response.json();
-      // setUser(user);
-      return user;
+      fetch(`http://localhost:8080/api/users/profile`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setUserDetails(data);
+        });
     } catch (error) {
-      console.error("Error fetching user details:", error.message);
-      throw error;
+      console.log("Error occurred while fetching posts:", error);
     }
-  };
+  });
 
   // --------RETURN
   return (
@@ -156,13 +50,13 @@ export const UserProfile = () => {
                 {/* User Image */}
                 <img
                   src="../src/Images/userAvatar.png"
-                  alt={user.username}
+                  alt={userDetails.username}
                   className="img-fluid rounded-circle mb-3 border border-info-subtle"
                   style={{ width: "150px", height: "150px" }}
                 />
 
                 {/* User Details */}
-                <h2 className="card-title">{user.username}</h2>
+                <h2 className="card-title">{userDetails.username}</h2>
                 {/* <p className="text-muted">{user.email}</p> */}
 
                 {/* Followers and Following */}
@@ -178,21 +72,17 @@ export const UserProfile = () => {
 
                 {/* User Role */}
                 <p className="card-text text-start">
-                  <strong>Email:</strong> {user.email}
+                  <strong>Email:</strong> {userDetails.email}
                 </p>
                 {/* User Role */}
                 <p className="card-text text-start">
                   <strong>Role:</strong> {user.role}
                 </p>
-
-                {/* User ID */}
-                {/* <p className="card-text text-start">
-                  <strong>User ID:</strong> {user.userid}
-                </p> */}
               </div>
             </div>
           </div>
         </div>
+        <Blogs />
       </div>
     </Base>
   );

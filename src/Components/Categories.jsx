@@ -1,9 +1,14 @@
+import { useNavigate } from "react-router-dom";
 export const Categories = () => {
+  const navigate = useNavigate();
   const centerDiv = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     width: "70%",
+  };
+  const handleCategoryClick = (categoryId) => {
+    navigate(`/categories/${categoryId}`);
   };
   return (
     <>
@@ -14,7 +19,6 @@ export const Categories = () => {
           <div className="text-center container" style={centerDiv}>
             <p
               className="btn  fw-regular rounded-pill"
-              // onClick={}
               style={{
                 backgroundColor: "#000",
                 color: "#fff",
@@ -26,7 +30,7 @@ export const Categories = () => {
             </p>
             <p
               className="btn  fw-regular rounded-pill"
-              // onClick={}
+              onClick={() => handleCategoryClick(1)}
               style={{
                 backgroundColor: "#000",
                 color: "#fff",
@@ -34,11 +38,35 @@ export const Categories = () => {
                 paddingRight: "2%",
               }}
             >
-              Tech
+              Technology
             </p>
             <p
               className="btn  fw-regular rounded-pill"
-              // onClick={}
+              onClick={() => handleCategoryClick(2)}
+              style={{
+                backgroundColor: "#000",
+                color: "#fff",
+                paddingLeft: "2%",
+                paddingRight: "2%",
+              }}
+            >
+              Business
+            </p>
+            <p
+              className="btn  fw-regular rounded-pill"
+              onClick={() => handleCategoryClick(3)}
+              style={{
+                backgroundColor: "#000",
+                color: "#fff",
+                paddingLeft: "2%",
+                paddingRight: "2%",
+              }}
+            >
+              Education
+            </p>
+            <p
+              className="btn  fw-regular rounded-pill"
+              onClick={() => handleCategoryClick(4)}
               style={{
                 backgroundColor: "#000",
                 color: "#fff",
@@ -50,7 +78,7 @@ export const Categories = () => {
             </p>
             <p
               className="btn  fw-regular rounded-pill"
-              // onClick={}
+              onClick={() => handleCategoryClick(5)}
               style={{
                 backgroundColor: "#000",
                 color: "#fff",
@@ -58,11 +86,11 @@ export const Categories = () => {
                 paddingRight: "2%",
               }}
             >
-              Food
+              Politics
             </p>
             <p
               className="btn  fw-regular rounded-pill"
-              // onClick={}
+              onClick={() => handleCategoryClick(6)}
               style={{
                 backgroundColor: "#000",
                 color: "#fff",
@@ -70,7 +98,7 @@ export const Categories = () => {
                 paddingRight: "2%",
               }}
             >
-              Travel
+              Trades
             </p>
           </div>
         </div>

@@ -44,6 +44,8 @@ export const BlogPost = ({ post }) => {
 
   const handleLike = () => {
     const token = sessionStorage.getItem("token");
+    const data = { post: { id: id }, user: { id: userId } };
+    console.log(data);
     // Implement logic to send like
     fetch(`http://localhost:8080/api/likes/like`, {
       method: "POST",
@@ -51,12 +53,12 @@ export const BlogPost = ({ post }) => {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ post: { id: id }, user: { id: userId } }),
+      body: JSON.stringify(data),
     })
       .then((response) => response.json())
       .then((data) => {
         // Update the like count
-        setLikeCount(data.length);
+        setLikeCount((prevCount) => prevCount + 1);
         console.log("like successful");
       })
       .catch((error) => {

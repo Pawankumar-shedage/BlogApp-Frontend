@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { BlogPost } from "./Blog-posts/BlogPost";
-import { Categories } from "./Categories";
 
 /* eslint-disable no-unused-vars */
 
-export const Blogs = () => {
+export const UpdateBlogs = () => {
   const [postIds, setPostsIds] = useState([]);
   const [posts, setPosts] = useState([]);
 
@@ -66,15 +65,50 @@ export const Blogs = () => {
     }
   }, [postIds]);
 
+  const handleDelete = (id) => {
+    const token = sessionStorage.getItem("token");
+
+    try {
+      fetch(`http://localhost:8080/api/posts/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+        });
+    } catch (error) {
+      console.log("Error occurred while fetching posts:", error);
+    }
+  };
+  const handleUpdate = (id) => {};
+
   // ------------------------RETURN STATEMENT------------------
   return (
     <div className="container ps-3" style={{ marginBottom: "60px" }}>
       <div className="row justify-content-center">
-        <Categories />
         {posts.map((post, index) => (
           <div key={index} className="individual-posts">
-            {/* Pass individual post data to BlogPost component */}
             <BlogPost post={post} />
+            <div>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                onClick={() => handleUpdate(post.id)}
+              >
+                Update
+              </button>
+              <button
+                type="submit"
+                className="btn btn-secondary"
+                onClick={() => handleDelete(post.id)}
+              >
+                delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
