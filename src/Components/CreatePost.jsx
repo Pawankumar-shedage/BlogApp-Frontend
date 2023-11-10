@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Base } from "./Base";
-import { loadCategories } from "../Services/Category_service";
-import { getCurrentUserData } from "../Auth";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const CreatePost = () => {
   const { userId } = useParams();
@@ -17,6 +18,8 @@ export const CreatePost = () => {
     user_id: userId,
   });
 
+  // for navigation
+  const navigate = useNavigate();
   // Updated array for category options
   const categoryOptions = [
     { id: 1, name: "Technology" },
@@ -54,9 +57,12 @@ export const CreatePost = () => {
         });
 
         if (!response.ok) {
+          toast.error("An error occurred while posting data");
           console.error("Failed to post data");
         } else {
           console.log("Data sent successfully ", response);
+          toast.success("Post published successfully");
+          navigate("/dashboard/blogPosts");
         }
       } catch (error) {
         console.log("An error occurred while posting data:", error);
@@ -163,6 +169,8 @@ export const CreatePost = () => {
               </button>
             </div>
           </form>
+
+          <ToastContainer />
         </div>
       </Base>
     </>
