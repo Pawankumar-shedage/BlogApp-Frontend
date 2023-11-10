@@ -13,8 +13,7 @@ import {
   faShareSquare,
 } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const BlogPost = ({ post }) => {
   //inline style css
@@ -29,41 +28,99 @@ export const BlogPost = ({ post }) => {
   const [dislikeBtn, setIsDislike] = useState(false);
   const [commentBtn, setIsComment] = useState(false);
   const [shareBtn, setIsShare] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [userId, setUserId] = useState();
 
-  // const initialContent = posts.post.
-  const { content } = post;
+  const { id, userName, content, createdDate } = post;
+
+  const date = createdDate.substring(0, 10);
   const minLengthInChars = 300;
-  const initialContent = post.content.substring(0, minLengthInChars);
+  const initialContent = content.substring(0, minLengthInChars);
   const [showFullContent, setShowFullContent] = useState(false);
 
   const handleReadMore = () => {
     setShowFullContent(!showFullContent);
   };
 
+  const handleLike = () => {
+    const token = sessionStorage.getItem("token");
+    // Implement logic to send like
+    fetch(`http://localhost:8080/api/likes/like`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ post: { id: id }, user: { id: userId } }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Update the like count
+        setLikeCount(data.length);
+        console.log("like successful");
+      })
+      .catch((error) => {
+        console.error("Error liking post:", error);
+        // Log more details about the response
+        error.response.json().then((data) => console.log(data));
+      });
+  };
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    // Fetch like count for the post
+    fetch(`http://localhost:8080/api/likes/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setLikeCount(data);
+      })
+      .catch((error) => console.error("Error fetching like count:", error));
+  }, [id]);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    // Fetch userId
+    fetch(`http://localhost:8080/api/users/id`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setUserId(data);
+      })
+      .catch((error) => console.error("Error fetching like count:", error));
+  }, []);
+
   //   -----------RETURN---
   return (
     <>
       <div className="card col-12 mb-3">
         <div className="card-body blogs ">
-          <div className="" key={post.id}>
+          <div className="" key={id}>
+            <p>@{userName}</p>
             <h5 className="card-title">
               <span className="fs-3 ">{post.title}</span>
               {/* div for 'by user_name' & 'created at' */}
               <br />
               <div className="lh-1" style={centerDiv}>
                 <p className="fs-6 fw-light my-3">
-                  {/* temp adding, slug instead of userName */}
-                  <small>{post.slug}</small>
-                </p>
-                <p className="fs-6 fw-light my-3">
-                  <small>{post.createtedAt}</small>
+                  <small>{date}</small>
                 </p>
               </div>
             </h5>
 
             {/* POST CONTENT */}
             <p className="card-text">
-              {showFullContent ? post.content : initialContent + "  ..."}
+              {showFullContent ? content : initialContent + "  ..."}
             </p>
           </div>
 
@@ -80,21 +137,10 @@ export const BlogPost = ({ post }) => {
               >
                 <FontAwesomeIcon
                   icon={likeBtn ? faSolidThumbsUp : faThumbsUp}
+                  onClick={() => handleLike()}
                 />
               </button>
-
-              {/* Dislike Btn */}
-              <button
-                className="btn"
-                onClick={() => {
-                  setIsDislike(!dislikeBtn);
-                  setIslike(false);
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={dislikeBtn ? faSolidThumbsDown : faThumbsDown}
-                />
-              </button>
+              <small>{likeCount}</small>
 
               {/* Comment Btn */}
               <button className="btn" onClick={() => setIsComment(!commentBtn)}>
@@ -113,13 +159,12 @@ export const BlogPost = ({ post }) => {
 
             {/* Read More btn */}
             {content.length > minLengthInChars && (
-              <Link
+              <button
                 className="readMore btn btn-secondary rounded-pill fw-regular"
-                to="/"
                 onClick={handleReadMore}
               >
                 {showFullContent ? "Read Less" : "Read More"}
-              </Link>
+              </button>
             )}
           </div>
         </div>

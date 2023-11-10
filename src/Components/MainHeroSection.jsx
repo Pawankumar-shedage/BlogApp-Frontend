@@ -1,6 +1,6 @@
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
 
@@ -21,10 +21,28 @@ export const MainHeroSection = () => {
     };
   }, []);
 
+  const [userId, setUserId] = useState();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    fetch(`http://localhost:8080/api/users/id`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setUserId(data);
+      })
+      .catch((error) => console.error("Error fetching user id:", error));
+  }, []);
+
   // Create post
   const navigate = useNavigate();
   const handleCreatePost = () => {
-    navigate("/dashboard/createPost");
+    navigate(`/dashboard/createPost/${userId}`);
   };
 
   //TO add fun() check if user is logged  in or if not then take him to login page.

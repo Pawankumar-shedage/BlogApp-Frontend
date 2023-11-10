@@ -27,7 +27,7 @@ function App() {
           {/* Private Routes-- needs log in */}
           <Route path="/dashboard" element={<PrivateRoute />}>
             <Route path="blogPosts" element={<ShowBlogs />}></Route>
-            <Route path="createPost" element={<CreatePost />}></Route>
+            <Route path="createPost/:userId" element={<CreatePost />}></Route>
             <Route path="userProfile" element={<UserProfile />}></Route>
           </Route>
         </Routes>
